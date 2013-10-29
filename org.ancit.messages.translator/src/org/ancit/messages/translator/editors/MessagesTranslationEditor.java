@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.ancit.messages.translator.Activator;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -62,13 +63,9 @@ public class MessagesTranslationEditor extends MultiPageEditorPart implements IR
 	/** The text editor used in page 0. */
 	private TextEditor editor;
 
-	/** The font chosen in page 1. */
-	private Font font;
-
 	/** The text widget used in page 2. */
 	private StyledText text;
 
-	private Browser browser;
 	/**
 	 * Creates a multi-page editor example.
 	 */
@@ -176,10 +173,20 @@ public class MessagesTranslationEditor extends MultiPageEditorPart implements IR
 	private void translateWords() {
 		String editorText =
 				editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
-		
-		Translate.setClientId("PropertiesFileTranslator");
-	    Translate.setClientSecret("hZvPOCl/f2TPam9T11fSOXv5q5Gci0LQ+dLtzk+12bY=");
+		//"PropertiesFileTranslator"
+		String clientID = Activator.getDefault().getPreferenceStore().getString("Client_ID");
+		//"hZvPOCl/f2TPam9T11fSOXv5q5Gci0LQ+dLtzk+12bY="
+	    String secretQuestion = Activator.getDefault().getPreferenceStore().getString("Client_SECRETQUESTION");
+	    if(clientID == null || clientID.isEmpty() || secretQuestion == null || secretQuestion.isEmpty()) {
+	    	text.setText("Client ID and/or Secret Question required to connect to Microsoft BING is not configured." +
+	    			"\nGo to windows>preferences>general>i18n Translator to configure the same." +
+	    			"\nPlease visit http://www.microsoft.com/web/post/using-the-free-bing-translation-apis to get details on how to get yourself a Client ID and Client Secret Question.");
+	    	return;
+	    }
+	    Translate.setClientId(clientID);
+	    Translate.setClientSecret(secretQuestion);
 	    StringBuffer outputText = new StringBuffer();
+	    
 		String[] propertyRecords = editorText.split("\n");
 		for (String propertyRecord : propertyRecords) {
 			String[] propertyEntry = propertyRecord.split("=");

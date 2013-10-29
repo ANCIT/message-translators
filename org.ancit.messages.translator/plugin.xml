@@ -6,11 +6,20 @@
       <editor
             class="org.ancit.messages.translator.editors.MessagesTranslationEditor"
             contributorClass="org.ancit.messages.translator.editors.MessagesTranslationEditorContributor"
-            filenames="messages.properties"
+            extensions="properties"
             icon="icons/sample.gif"
             id="org.ancit.messages.translator.editors.MessagesTranslationEditor"
             name="Messages Translation Editor">
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.ancit.messages.translator.preferences.MicrosoftBingTranslatorPreferencePage"
+            id="org.ancit.messages.translator.preferences.MicrosoftBingTranslatorPreferencePage"
+            name="i18n Translator">
+      </page>
    </extension>
 
 </plugin>
