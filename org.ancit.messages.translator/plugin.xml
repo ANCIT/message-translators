@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.ancit.messages.translator.editors.MessagesTranslationEditor"
+            contributorClass="org.ancit.messages.translator.editors.MessagesTranslationEditorContributor"
+            filenames="messages.properties"
+            icon="icons/sample.gif"
+            id="org.ancit.messages.translator.editors.MessagesTranslationEditor"
+            name="Messages Translation Editor">
+      </editor>
+   </extension>
+
+</plugin>
