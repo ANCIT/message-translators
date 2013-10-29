@@ -187,6 +187,8 @@ public class MessagesTranslationEditor extends MultiPageEditorPart implements IR
 	    Translate.setClientSecret(secretQuestion);
 	    StringBuffer outputText = new StringBuffer();
 	    
+	    
+	    
 		String[] propertyRecords = editorText.split("\n");
 		for (String propertyRecord : propertyRecords) {
 			String[] propertyEntry = propertyRecord.split("=");
@@ -200,10 +202,13 @@ public class MessagesTranslationEditor extends MultiPageEditorPart implements IR
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					text.setText("Error Occurred while Translation of your Properties File." +
+							"\nVerify if the ClientID and ClientSecretQuestion required for BING is configued properly.");
+					return;
 				}
 			}
 		}
-		text.setText(outputText.toString());
+		text.setText("#This Property File is translated by ANCIT's Message i18n Translation Editor \n"+outputText.toString());
 	}
 	/**
 	 * Closes all project files on project close.
