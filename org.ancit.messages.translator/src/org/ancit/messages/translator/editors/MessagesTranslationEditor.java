@@ -1,14 +1,6 @@
 package org.ancit.messages.translator.editors;
 
 
-import java.io.StringWriter;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.StringTokenizer;
-
 import org.ancit.messages.translator.Activator;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -16,34 +8,24 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.internal.texteditor.PropertyEventDispatcher;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
-import org.eclipse.ui.views.properties.IPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 import com.memetix.mst.language.Language;
 import com.memetix.mst.translate.Translate;
@@ -187,7 +169,26 @@ public class MessagesTranslationEditor extends MultiPageEditorPart implements IR
 	    Translate.setClientSecret(secretQuestion);
 	    StringBuffer outputText = new StringBuffer();
 	    
-	    
+	    String propertiesFileName = ((IFileEditorInput)editor.getEditorInput()).getFile().getName();
+	    propertiesFileName = propertiesFileName.substring(0,propertiesFileName.lastIndexOf("."));
+	    Language translateLanguage = Language.ENGLISH;
+	    if(propertiesFileName.endsWith("_fr") || propertiesFileName.endsWith("_de") || propertiesFileName.equals("_ja")) {
+	    	String language = propertiesFileName.substring(propertiesFileName.lastIndexOf("_")+1);
+	    	translateLanguage = getLanguage(language);
+	    } else {
+	    	ElementListSelectionDialog dialog = 
+	    		     new ElementListSelectionDialog(Display.getDefault().getActiveShell(), new LanguageLabelProvider());
+	    		dialog.setTitle("Language Selection");
+	    		dialog.setMessage("Select a Language to translate into... (* = any string, ? = any char):");
+	    		dialog.setElements(Language.values());
+	    		int open = dialog.open();
+	    		if(open == IDialogConstants.CANCEL_ID) {
+	    			text.setText("Error Occurred while Translation of your Properties File." +
+							"\nYou did not select a Language to translate into...");
+	    			return;
+	    		}
+	    		translateLanguage =  (Language)dialog.getFirstResult();
+	    }
 	    
 		String[] propertyRecords = editorText.split("\n");
 		for (String propertyRecord : propertyRecords) {
@@ -197,7 +198,7 @@ public class MessagesTranslationEditor extends MultiPageEditorPart implements IR
 				String value = propertyEntry[1];
 
 				try {
-					value = Translate.execute(value, Language.ENGLISH, Language.FRENCH);
+					value = Translate.execute(value, translateLanguage);
 					outputText.append(key+"="+value+"\n");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -208,7 +209,10 @@ public class MessagesTranslationEditor extends MultiPageEditorPart implements IR
 				}
 			}
 		}
-		text.setText("#This Property File is translated by ANCIT's Message i18n Translation Editor \n"+outputText.toString());
+		text.setText("#This Property File is translated by ANCIT's Message i18n Translator Plugin \n"+outputText.toString());
+	}
+	private Language getLanguage(String language) {		
+		return Language.fromString(language);
 	}
 	/**
 	 * Closes all project files on project close.
