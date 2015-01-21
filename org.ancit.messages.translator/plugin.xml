@@ -21,5 +21,41 @@
             name="i18n Translator">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.ancit.messages.translator.messagetranslator"
+            name="Translate message.properties">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+         <command
+               commandId="org.ancit.messages.translator.messagetranslator"
+               label="Translate message.properties"
+               style="push">
+                <visibleWhen>
+				           <with variable="activeMenuSelection">
+				            <iterate
+				                 ifEmpty="false">
+				             <adapt type="org.eclipse.core.resources.IResource">
+				               <test property="org.eclipse.core.resources.name" value="messages.properties" />
+				             </adapt>
+				            </iterate>
+				           </with>
+         			</visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.ancit.messages.translator.handlers.TranslateMessagesHandler"
+            commandId="org.ancit.messages.translator.messagetranslator">
+      </handler>
+   </extension>
 
 </plugin>
